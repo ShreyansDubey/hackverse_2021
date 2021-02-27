@@ -6,8 +6,11 @@ import os
 import numpy as np
 import datetime
 from flask_pymongo import PyMongo
+from json import loads
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 app.config["MONGO_URI"] = "mongodb+srv://shreyans:hackverse@cluster0.hwwer.mongodb.net/hackverse2021?retryWrites=true&w=majority"
 mongo = PyMongo(app)
 
@@ -26,20 +29,31 @@ def getTileFromMap(x_start, x_end, y_start, y_end):
     return current_map[x_start:x_end, y_start:y_end]
 
 # 127.0.0.1 - - [27/Feb/2021 19:54:23] "GET /tile?x=187528&y=121548&zoom=18 HTTP/1.1" 200 -
-def updateMapVal(x, y):
+def updateMapVal(x, y, count=1):
     global current_map
-    x = x + 366 * 2 ** 11
-    y = y + 237 * 2 ** 11
+    x = x - 366 * 2 ** 11
+    y = y - 237 * 2 ** 11
+    print("x", x, "y", y)
+    if x < 0 or x >= 2**11 or y < 0 or y >= 2**11:
+        print("out of bound")
+        return
     
-    if current_map[x, y] < 255:
-        current_map[x, y] += 1
+    if current_map[x, y] + count < 255:
+        current_map[x, y] += count
+        print("updated", x, y, current_map[x, y])
+    else:
+        current_map[x, y] = 255
+        print("max reached")
 
 def init_current_map():
     global current_map
-    # current_map = (np.random.rand(map_size, map_size) * 255).astype(np.uint8)
-    current_map = np.zeros((map_size, map_size), dtype=np.uint8)
-    # current_map[0:100, 0:100] = 100
-    # current_map[100:200, 100:200] = 200
+    try:
+        current_map = np.load('map.pkl')
+    except:
+        # current_map = (np.random.rand(map_size, map_size) * 255).astype(np.uint8)
+        current_map = np.zeros((map_size, map_size), dtype=np.uint8)
+        # current_map[0:100, 0:100] = 100
+        # current_map[100:200, 100:200] = 200
 
 
 @app.route('/tile', methods=["GET"])
@@ -81,34 +95,30 @@ def get_tile():
 
 @app.route('/coordinates', methods=["POST"])
 def save_coordinate():
-    latitude = float(request.json['latitude'])
-    longitude = float(request.json['longitude'])
+    x = int(request.json['x'])
+    y = int(request.json['y'])
 
-    # Scale extrema
-    LAT_MAX = 85
-    LAT_MIN = -85
-    LONG_MAX = 180
-    LONG_MIN = -180
-    TILE_MAX = 2**20
-    TILE_MIN = 0
-    
-    # Converting lat long to tile coords by linear scaling
-    tile_x = (((latitude - LAT_MIN) / (LAT_MAX - LAT_MIN)) * (TILE_MAX - TILE_MIN)) + TILE_MIN
-    tile_y = (((longitude - LONG_MIN) / (LONG_MAX - LONG_MIN)) * (TILE_MAX - TILE_MIN)) + TILE_MIN
-    
-    # Casting to int to round-down
-    tile_x = int(tile_x)
-    tile_y = int(tile_y)
+    updateMapVal(x, y)
+    return ('', 204)
 
-    # current_date = datetime.datetime.now().strftime("%d_%m_%Y")
-    # current_hour = datetime.datetime.now().strftime("%H")
+@app.route('/generator', methods=["POST"])
+def generator():
+    x = int(request.json['x'])
+    y = int(request.json['y'])
 
-    # Increment specific pixel value in db for current date and time
-    updateMapVal(tile_x, tile_y)
+    updateMapVal(x, y, 100)
+    return ('', 204)
+
+
+@app.route('/pickle', methods=["GET"])
+def pickle():
+    global current_map
+    with open("map.npy", 'w') as f:
+        current_map.save(f)
     
 
 
-PORT = os.environ.get("PORT") if os.environ.get("PORT") != None else 5000
+PORT = os.environ.get("PORT") if os.environ.get("PORT") != None else 8000
 if __name__ == '__main__':
     init_current_map()
     app.run(host='0.0.0.0', port=PORT)
