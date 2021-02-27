@@ -1,1 +1,4 @@
 node_modules/
+server/imgs/
+server/__pycache__/
+.vscode/
