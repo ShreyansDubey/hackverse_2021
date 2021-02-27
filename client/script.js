@@ -45,7 +45,30 @@ function project(latLng) {
     );
 }
 
+prevX = 0;
+prevY = 0;
 
+function sendNavData(pos) {
+    console.log("sending", pos)
+    latitude = pos.coords.latitude
+    longitude = pos.coords.longitude
+    tile = getTileCoordinate(new google.maps.LatLng(latitude, longitude), 20);
+    if(tile.x != prevX || tile.y != prevY) {
+        prevX = tile.x
+        prevY = tile.y
+        console.log("tile", tile.x, tile.y);
+        fetch("http://localhost:5000/generator", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                x: tile.x,
+                y: tile.y
+            })
+        });
+    }
+}
 
 
 function initMap() {
@@ -62,26 +85,18 @@ function initMap() {
         new CoordMapType(new google.maps.Size(256, 256))
     );
 
-    
-    // convert this to gps, 6 times per second
-    // only if block changes, send api request to update
-    
-    
-    map.addListener('click', async (mapsMouseEvent) => {
-        lat = mapsMouseEvent.latLng.lat();
-        lng = mapsMouseEvent.latLng.lng()
-        console.log("clicked", lat, lng);
-        tileCoordinate = getTileCoordinate(mapsMouseEvent.latLng, 20)
-        console.log("tile", tileCoordinate.x, tileCoordinate.y);
-        fetch("http://localhost:5000/generator", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                x: tileCoordinate.x,
-                y: tileCoordinate.y
-            })
-        });
-    });
+    options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+    }
+    console.log("launching gps")
+    // setInterval(() => {
+    //     if(!navigator.geolocation) {
+    //         alert("browser faltu hai")
+    //         return
+    //     }
+    //     navigator.geolocation.getCurrentPosition(sendNavData, e => console.log(error));
+    // }, 1000);
+    navigator.geolocation.watchPosition(sendNavData, e => console.log(e) , options);
 }
