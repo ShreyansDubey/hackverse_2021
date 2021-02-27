@@ -55,6 +55,19 @@ def init_current_map():
         # current_map[0:100, 0:100] = 100
         # current_map[100:200, 100:200] = 200
 
+def smooth_tiles(x, y, initial_weight) :
+    x_neighbor_coords = [x + d for d in range(-5,6)]
+    y_neighbor_coords = [y + d for d in range(-5,6)]
+
+    for x_n in x_neighbor_coords:
+        for y_n in y_neighbor_coords: 
+            if ( x_n != x and y_n != y) :
+                man_distance = abs(x - x_n) + abs(y - y_n)
+                weight = initial_weight / (2 ** man_distance)
+                print(initial_weight, weight)
+                updateMapVal(x_n, y_n, weight)
+
+
 
 @app.route('/tile', methods=["GET"])
 def get_tile():
@@ -122,17 +135,18 @@ def generator():
 
     updateMapVal(x, y, 100)
 
-    # Adjecent neighbours
-    updateMapVal(x, y + 1, 40)
-    updateMapVal(x, y - 1, 40)
-    updateMapVal(x + 1, y, 40)
-    updateMapVal(x - 1, y, 40)
+    # # Adjecent neighbours
+    # updateMapVal(x, y + 1, 40)
+    # updateMapVal(x, y - 1, 40)
+    # updateMapVal(x + 1, y, 40)
+    # updateMapVal(x - 1, y, 40)
 
-    # Diagonal neighbours
-    updateMapVal(x + 1, y + 1, 20)
-    updateMapVal(x + 1, y - 1, 20)
-    updateMapVal(x - 1, y - 1, 20)
-    updateMapVal(x - 1, y + 1, 20)
+    # # Diagonal neighbours
+    # updateMapVal(x + 1, y + 1, 20)
+    # updateMapVal(x + 1, y - 1, 20)
+    # updateMapVal(x - 1, y - 1, 20)
+    # updateMapVal(x - 1, y + 1, 20)
+    smooth_tiles(x, y, 100)
 
     return ('', 204)
 
