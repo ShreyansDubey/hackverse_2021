@@ -98,7 +98,21 @@ def save_coordinate():
     x = int(request.json['x'])
     y = int(request.json['y'])
 
-    updateMapVal(x, y)
+    
+    updateMapVal(x, y, 2)
+
+    # Adjecent neighbours
+    updateMapVal(x, y + 1)
+    updateMapVal(x, y - 1)
+    updateMapVal(x + 1, y)
+    updateMapVal(x - 1, y)
+
+    # Diagonal neighbours
+    updateMapVal(x + 1, y + 1)
+    updateMapVal(x + 1, y - 1)
+    updateMapVal(x - 1, y - 1)
+    updateMapVal(x - 1, y + 1)
+
     return ('', 204)
 
 @app.route('/generator', methods=["POST"])
@@ -107,6 +121,19 @@ def generator():
     y = int(request.json['y'])
 
     updateMapVal(x, y, 100)
+
+    # Adjecent neighbours
+    updateMapVal(x, y + 1, 40)
+    updateMapVal(x, y - 1, 40)
+    updateMapVal(x + 1, y, 40)
+    updateMapVal(x - 1, y, 40)
+
+    # Diagonal neighbours
+    updateMapVal(x + 1, y + 1, 20)
+    updateMapVal(x + 1, y - 1, 20)
+    updateMapVal(x - 1, y - 1, 20)
+    updateMapVal(x - 1, y + 1, 20)
+
     return ('', 204)
 
 
@@ -118,7 +145,7 @@ def pickle():
     
 
 
-PORT = os.environ.get("PORT") if os.environ.get("PORT") != None else 8000
+PORT = os.environ.get("PORT") if os.environ.get("PORT") != None else 5000
 if __name__ == '__main__':
     init_current_map()
     app.run(host='0.0.0.0', port=PORT)
