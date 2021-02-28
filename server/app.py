@@ -48,7 +48,7 @@ def updateMapVal(x, y, count=1):
 def init_current_map():
     global current_map
     try:
-        current_map = np.load('map.pkl')
+        current_map = np.load('map.npy')
     except:
         # current_map = (np.random.rand(map_size, map_size) * 255).astype(np.uint8)
         current_map = np.zeros((map_size, map_size), dtype=np.uint8)
