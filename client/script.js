@@ -48,10 +48,18 @@ function project(latLng) {
 prevX = 0;
 prevY = 0;
 
+var map;
+var marker;
+var myLatLng;
+
+
 function sendNavData(pos) {
     console.log("sending", pos)
     latitude = pos.coords.latitude
     longitude = pos.coords.longitude
+
+    marker.setPosition(new google.maps.LatLng(latitude, longitude));
+
     tile = getTileCoordinate(new google.maps.LatLng(latitude, longitude), 20);
     if(tile.x != prevX || tile.y != prevY) {
         prevX = tile.x
@@ -72,18 +80,25 @@ function sendNavData(pos) {
 
 
 function initMap() {
-    const map = new google.maps.Map(document.getElementById("map"), {
+    map = new google.maps.Map(document.getElementById("map"), {
         zoom: 10,
         center: {
             lat: 12.9716,
             lng: 77.5946
         },
     });
-    
     map.overlayMapTypes.insertAt(
         0,
         new CoordMapType(new google.maps.Size(256, 256))
     );
+
+    marker = new google.maps.Marker({
+        position: myLatLng,
+        map,
+        title: "You are Here",
+    });
+
+    marker.setMap(map);
 
     options = {
         enableHighAccuracy: true,

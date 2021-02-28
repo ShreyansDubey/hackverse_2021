@@ -48,12 +48,25 @@ def updateMapVal(x, y, count=1):
 def init_current_map():
     global current_map
     try:
-        current_map = np.load('map.pkl')
+        current_map = np.load('map.npy')
     except:
         # current_map = (np.random.rand(map_size, map_size) * 255).astype(np.uint8)
         current_map = np.zeros((map_size, map_size), dtype=np.uint8)
         # current_map[0:100, 0:100] = 100
         # current_map[100:200, 100:200] = 200
+
+def smooth_tiles(x, y, initial_weight) :
+    x_neighbor_coords = [x + d for d in range(-5,6)]
+    y_neighbor_coords = [y + d for d in range(-5,6)]
+
+    for x_n in x_neighbor_coords:
+        for y_n in y_neighbor_coords: 
+            if ( x_n != x and y_n != y) :
+                man_distance = abs(x - x_n) + abs(y - y_n)
+                weight = initial_weight / (2 ** man_distance)
+                print(initial_weight, weight)
+                updateMapVal(x_n, y_n, weight)
+
 
 
 @app.route('/tile', methods=["GET"])
@@ -122,26 +135,26 @@ def generator():
 
     updateMapVal(x, y, 100)
 
-    # Adjecent neighbours
-    updateMapVal(x, y + 1, 40)
-    updateMapVal(x, y - 1, 40)
-    updateMapVal(x + 1, y, 40)
-    updateMapVal(x - 1, y, 40)
+    # # Adjecent neighbours
+    # updateMapVal(x, y + 1, 40)
+    # updateMapVal(x, y - 1, 40)
+    # updateMapVal(x + 1, y, 40)
+    # updateMapVal(x - 1, y, 40)
 
-    # Diagonal neighbours
-    updateMapVal(x + 1, y + 1, 20)
-    updateMapVal(x + 1, y - 1, 20)
-    updateMapVal(x - 1, y - 1, 20)
-    updateMapVal(x - 1, y + 1, 20)
+    # # Diagonal neighbours
+    # updateMapVal(x + 1, y + 1, 20)
+    # updateMapVal(x + 1, y - 1, 20)
+    # updateMapVal(x - 1, y - 1, 20)
+    # updateMapVal(x - 1, y + 1, 20)
+    smooth_tiles(x, y, 100)
 
     return ('', 204)
 
 
 @app.route('/pickle', methods=["GET"])
 def pickle():
-    global current_map
-    with open("map.npy", 'w') as f:
-        current_map.save(f)
+    np.save('map.npy', current_map)
+    return ('', 204)
     
 
 

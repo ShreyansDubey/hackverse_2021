@@ -55,8 +55,16 @@ function project(latLng) {
 
 
 }
-
+ 
 function initMap() {
+    
+    const pickle_button = document.getElementById("pickle");
+    pickle_button.addEventListener('click', () => {
+        fetch("http://localhost:5000/pickle", {
+            method: "GET"
+        });
+    });
+
     const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 10,
         center: {
