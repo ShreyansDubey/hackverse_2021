@@ -39,12 +39,12 @@ Project made during Hackverse 2.0 Feb 27th-28th 2021
 
 - Installation steps:
     - Install anaconda for your specifc OS [https://www.anaconda.com/products/individual](https://www.anaconda.com/products/individual)
-    - Create a new anaconda environment: conda create <env_name>
-    - Activate environment: conda activate <env_name>
-    - Install the required dependencies: pip install -r requirements.txt
-    - If the above command throws error: pip install -r requirements.txt --user
-    - Start the server: cd server && python app.py
-    - Open the index.html in browser to demo
+    - Create a new anaconda environment: `conda create <env_name>`
+    - Activate environment: `conda activate <env_name>`
+    - Install the required dependencies: `pip install -r requirements.txt`
+    - If the above command throws error: `pip install -r requirements.txt --user`
+    - Start the server: `cd server && python app.py`
+    - Open the `index.html` in browser to demo
 
 
 - Declaration of previous work: The hack was made completely in the given time
