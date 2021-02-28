@@ -61,9 +61,7 @@ function initMap() {
     const pickle_button = document.getElementById("pickle");
     pickle_button.addEventListener('click', () => {
         fetch("http://localhost:5000/pickle", {
-            method: "GET",
-            headers: {},
-            body: {}
+            method: "GET"
         });
     });
 

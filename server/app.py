@@ -153,9 +153,8 @@ def generator():
 
 @app.route('/pickle', methods=["GET"])
 def pickle():
-    global current_map
-    with open("map.npy", 'w') as f:
-        current_map.save(f)
+    np.save('map.npy', current_map)
+    return ('', 204)
     
 
 
